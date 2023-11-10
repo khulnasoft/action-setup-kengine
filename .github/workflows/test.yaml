@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        version: [0.0.18, ""]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup kengine
+      uses: ./
+      with:
+        version: ${{ matrix.version }}
+
+    - name: Capture kengine version installed
+      run: |
+        export KENGINE_VERSION=$( kengine --version )
+        echo 'KENGINE_VERSION_INSTALLED<<EOF' >> $GITHUB_ENV
+        kengine --version >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Verify
+      shell: python
+      env:
+        KENGINE_VERSION_EXPECTED: ${{ matrix.version }}
+      run: |
+        import sys, os
+        sys.exit(
+            int(not os.environ["KENGINE_VERSION_EXPECTED"] in os.environ["KENGINE_VERSION_INSTALLED"])
+        )

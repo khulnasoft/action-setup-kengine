@@ -1,0 +1,15 @@
+name: 'setup-kengine'
+description: 'Install Kengine CLI on Github Actions runners'
+branding:
+  icon: bar-chart-2
+  color: green
+inputs:
+  kengine-api-key:  # id of input
+    description: 'Api Key'
+    required: true
+  version:
+    description: 'Version of the Kengine CLI to install'
+    required: false
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
